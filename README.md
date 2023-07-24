@@ -8,6 +8,8 @@ The lambda uses the [AWS Lambda Adaptor](https://github.com/awslabs/aws-lambda-w
 
 Wordpress data storage is backed by SQLite which is replicated into S3 storage via [litestream](https://litestream.io/). Previous state is restored to the lambda on cold-start. Concurrent access to the datastore by multiple lambdas is conveniently ignored and likely to be unstable.
 
+*NOTE:* the stack uses a `arm64`` architecture and will require docker builds of the supporting lambda software. This will require a reasonable amount of [cross-architecture docker builds](https://www.docker.com/blog/multi-arch-images/) ( we require php with modern SQLite support ).
+
 ![diagram](_media/Architecture.png ':size=25%')
 
 ## Useful commands
