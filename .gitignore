@@ -1,0 +1,11 @@
+*.js
+!jest.config.js
+*.d.ts
+node_modules
+
+resources/api-lambda-adapter-example-cdk
+resources/aws-lambda-web-adapter
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out

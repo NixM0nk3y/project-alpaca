@@ -1,0 +1,66 @@
+{
+	http_port 8080
+	https_port 8443
+
+	auto_https disable_redirects
+
+	storage file_system {
+		root /tmp/caddy
+	}
+}
+
+127.0.0.1:8080, *.execute-api.eu-west-1.amazonaws.com:8080 {
+	header {
+		# disable FLoC tracking
+		Permissions-Policy interest-cohort=()
+
+		# enable HSTS
+		Strict-Transport-Security max-age=31536000;
+
+		# disable clients from sniffing the media type
+		X-Content-Type-Options nosniff
+
+		# clickjacking protection
+		X-Frame-Options SAMEORIGIN
+
+		# keep referrer data off of HTTP connections
+		Referrer-Policy no-referrer-when-downgrade
+
+		X-XSS-Protection "1; mode=block;"
+
+		X-Robots-Tag "googlebot: nofollow;otherbot: noindex, nofollow;"
+
+		# remove server header and other tech leaking headers
+		-server
+		-x-powered-by
+		-x-redirect-by
+	}
+
+	root * {env.LAMBDA_TASK_ROOT}/app/web
+	encode gzip zstd
+
+	handle_path /adapter/httpbin/* {
+		rewrite * /{path}
+		reverse_proxy httpbin.org
+	}
+
+	respond /adapter/hello "Hello, world!" {
+		close
+	}
+
+	php_fastcgi 127.0.0.1:3000
+	file_server
+
+	@forbidden {
+		path *.sql
+		path /uploads/*.php
+		path /.htaccess
+		path /tempdeploy
+	}
+
+	respond @forbidden 404
+
+	log {
+		format json
+	}
+}

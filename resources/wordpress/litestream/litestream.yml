@@ -1,0 +1,4 @@
+dbs:
+  - path: /tmp/wpdata/wp.sqlite
+    replicas:
+      - url: ${DB_REPLICA_URL}

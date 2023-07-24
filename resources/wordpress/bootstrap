@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Fail on error
+set -e
+#set -x
+
+#
+LAMBDA_TASK_ROOT=${LAMBDA_TASK_ROOT:-"/var/task"}
+
+#
+DB_LOCATION=${DB_LOCATION:-"/tmp/wpdata/wp.sqlite"}
+DB_REPLICA_URL=${DB_REPLICA_URL:-"localhost"}
+
+# Restore the database if it does not already exist.
+if [ -f ${DB_LOCATION} ]; then
+	echo "Database already exists, skipping restore"
+else
+	echo "No database found, restoring from replica if exists"
+    mkdir -p /tmp/wpdata
+	${LAMBDA_TASK_ROOT}/litestream/litestream restore -config ${LAMBDA_TASK_ROOT}/litestream/litestream.yml -if-replica-exists -v ${DB_LOCATION}
+    touch ${DB_LOCATION}
+fi
+
+export LD_LIBRARY_PATH=/opt/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib
+
+exec -- "${LAMBDA_TASK_ROOT}/supervisor/supervisord" -c ${LAMBDA_TASK_ROOT}/supervisor/supervisord.conf

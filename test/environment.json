@@ -1,0 +1,7 @@
+{
+    "function": {
+        "LOG_LEVEL": "DEBUG",
+        "AWS_LAMBDA_EXEC_WRAPPER": "/opt/bootstrap",
+        "ENVIRONMENT": "development"
+    }
+}
